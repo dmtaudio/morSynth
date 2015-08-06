@@ -16,8 +16,8 @@ Oscillator::Oscillator()
 
 Oscillator::~Oscillator()
 {
-    if(buffer != nullptr)
-        delete buffer;
+    if(_buffer != nullptr)
+        delete _buffer;
 }
 
 double Oscillator::generateWhiteNoise()
@@ -99,40 +99,65 @@ double Oscillator::generateTriangleWave(double freq, double sampleRate)
 double* Oscillator::fillWhiteNoiseBuffer(int bufferLength)
 {
     _currentPhase = 0.0;
-    if(buffer != nullptr)
-        delete buffer;
-    buffer = new double[bufferLength];
-    for(int i = 0; i < bufferLength; ++i)
+    _bufferLength = bufferLength;
+    if(_buffer != nullptr)
+        delete _buffer;
+    _buffer = new double[_bufferLength];
+    for(int i = 0; i < _bufferLength; ++i)
     {
-        buffer[i] = generateWhiteNoise();
+        _buffer[i] = generateWhiteNoise();
     }
-    return buffer;
+    return _buffer;
 }
 
 double* Oscillator::fillOscillatorBuffer(Type osc, double freq, double sampleRate, int bufferLength)
 {
     _currentPhase = 0.0;
-    if(buffer != nullptr)
-        delete buffer;
-    buffer = new double[bufferLength];
+    _bufferLength = bufferLength;
+    if(_buffer != nullptr)
+        delete _buffer;
+    _buffer = new double[bufferLength];
     for(int i = 0; i < bufferLength; ++i)
     {
         switch (osc)
         {
             case SINE:
-                buffer[i] = generateSineWave(freq, sampleRate);
+                _buffer[i] = generateSineWave(freq, sampleRate);
                 break;
             case UPWARD_SAWTOOTH:
-                buffer[i] = generateUpSawtooth(freq, sampleRate);
+                _buffer[i] = generateUpSawtooth(freq, sampleRate);
             case DOWNWARD_SAWTOOTH:
-                buffer[i] = generateDownSawtooth(freq, sampleRate);
+                _buffer[i] = generateDownSawtooth(freq, sampleRate);
             case SQUARE:
-                buffer[i] = generateSquareWave(freq, sampleRate);
+                _buffer[i] = generateSquareWave(freq, sampleRate);
                 break;
             case TRIANGLE:
-                buffer[i] = generateTriangleWave(freq, sampleRate);
+                _buffer[i] = generateTriangleWave(freq, sampleRate);
                 break;
         }
     }
-    return buffer;
+    return _buffer;
 }
+
+AudioSampleBuffer* Oscillator::fillAudioSampleBuffer(int channels)
+{
+    _sampleBuffer = new AudioSampleBuffer(channels, _bufferLength);
+    
+    float* temp = new float[_bufferLength];
+    for(int i = 0; i < _bufferLength; ++i)
+    {
+       temp[i] = _buffer[i];
+        if(channels == 1)
+            _sampleBuffer->addSample(1, i, temp[i]);
+        else if(channels == 2)
+        {
+            _sampleBuffer->addSample(1, i, temp[i]);
+            _sampleBuffer->addSample(2, i, temp[i]);
+        }
+        else
+            return nullptr;
+    }
+    delete temp;
+    return _sampleBuffer;
+}
+

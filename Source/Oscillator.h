@@ -41,11 +41,14 @@ public:
     
     double* fillWhiteNoiseBuffer(int bufferLength);
     double* fillOscillatorBuffer(Type osc, double freq, double sampleRate, int bufferLength);
+    
+    AudioSampleBuffer* fillAudioSampleBuffer(int channels);
 
 private:
     double _currentPhase;
-    double* buffer;
-    AudioSampleBuffer* sampleBuffer;
+    int _bufferLength;
+    double* _buffer;
+    AudioSampleBuffer* _sampleBuffer;
 };
 
 
