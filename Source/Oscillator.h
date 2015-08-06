@@ -16,6 +16,7 @@
 inline double pi() { return 3.14159265358979323846; }
 inline double twopi() { return pi() * 2.0; }
 
+
 class Oscillator
 {
 public:
@@ -35,6 +36,8 @@ public:
     double generateSineWave(double freq, double sampleRate);
     double generateUpSawtooth(double freq, double sampleRate);
     double generateDownSawtooth(double freq, double sampleRate);
+    double generateSquareWave(double freq, double sampleRate);
+    double generateTriangleWave(double freq, double sampleRate);
     
     double* fillWhiteNoiseBuffer(int bufferLength);
     double* fillOscillatorBuffer(Type osc, double freq, double sampleRate, int bufferLength);
@@ -42,6 +45,7 @@ public:
 private:
     double _currentPhase;
     double* buffer;
+    AudioSampleBuffer* sampleBuffer;
 };
 
 

@@ -68,8 +68,37 @@ double Oscillator::generateDownSawtooth(double freq, double sampleRate)
     return out;
 }
 
+double Oscillator::generateSquareWave(double freq, double sampleRate)
+{
+    double incr = freq * twopi() / sampleRate;
+    double out;
+    if(_currentPhase <= pi())
+        out = 1.0;
+    else
+        out = -1.0;
+    _currentPhase += incr;
+    if(_currentPhase >= twopi())
+        _currentPhase -= twopi();
+    if(_currentPhase < 0.0)
+        _currentPhase += twopi();
+    return out;
+}
+
+double Oscillator::generateTriangleWave(double freq, double sampleRate)
+{
+    double incr = freq * twopi() / sampleRate;
+    double out = (2.0 * (_currentPhase * (1.0 / twopi()))) - 1.0;
+    _currentPhase += incr;
+    if(_currentPhase >= twopi())
+        _currentPhase -= twopi();
+    if(_currentPhase < 0.0)
+        _currentPhase += twopi();
+    return out;
+}
+
 double* Oscillator::fillWhiteNoiseBuffer(int bufferLength)
 {
+    _currentPhase = 0.0;
     if(buffer != nullptr)
         delete buffer;
     buffer = new double[bufferLength];
@@ -82,6 +111,7 @@ double* Oscillator::fillWhiteNoiseBuffer(int bufferLength)
 
 double* Oscillator::fillOscillatorBuffer(Type osc, double freq, double sampleRate, int bufferLength)
 {
+    _currentPhase = 0.0;
     if(buffer != nullptr)
         delete buffer;
     buffer = new double[bufferLength];
@@ -97,8 +127,10 @@ double* Oscillator::fillOscillatorBuffer(Type osc, double freq, double sampleRat
             case DOWNWARD_SAWTOOTH:
                 buffer[i] = generateDownSawtooth(freq, sampleRate);
             case SQUARE:
+                buffer[i] = generateSquareWave(freq, sampleRate);
                 break;
             case TRIANGLE:
+                buffer[i] = generateTriangleWave(freq, sampleRate);
                 break;
         }
     }
